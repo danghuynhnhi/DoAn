@@ -43,9 +43,13 @@
 
 /* USER CODE BEGIN PV */
 uint8_t dem = 0;
-uint8_t var[4] = {15,15,15,15};
+uint8_t var[4] = {17,17,17,17};
 uint8_t password[4] = {1,1,1,1};
 uint8_t Nhapsai = 0;
+uint8_t last_key = 17; // Lưu phím vừa nhấn (ban đầu là không nhấn gì)
+uint32_t last_key_time = 0;  // Thời gian của lần nhấn phím trước đó
+
+uint8_t key_count = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -55,25 +59,76 @@ static void MX_GPIO_Init(void);
 void quetbanphim()
 {
 
-	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_0,0);
-	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3)==0)                // nhan phim 1
-		{
-			while(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3)==0){}
-			if(dem<4)
-			{
-				var[dem] = 1;
-				dem++;
-			}
-		}
+	 uint32_t current_time = HAL_GetTick(); // Lấy thời gian hiện tại (ms)
+
+	    // Quét cột thứ nhất
+	    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, 0); // Kéo cột 1 xuống mức thấp
+	    if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3) == 0) // Nhấn phím "1"
+	    {
+	        while (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3) == 0) {} // Chờ thả phím
+
+	        if (last_key == 1) // Nếu phím trước đó cũng là "1"
+	        {
+	            // Kiểm tra thời gian giữa hai lần nhấn
+	            if ((current_time - last_key_time) <= 500) // Nếu trong vòng 5s
+	            {
+	                var[dem-1] = 10; // Gán "A" vào var[0]
+//	                dem++;     // Đặt vị trí tiếp theo là var[1]
+	            }
+	            else // Nếu cách nhau > 5s
+	            {
+	                if (dem < 4)
+	                {
+	                    var[dem] = 1; // Gán giá trị "1"
+	                    dem++;
+	                }
+	            }
+	        }
+	        else // Nếu đây là lần nhấn đầu tiên
+	        {
+	            if (dem < 4)
+	            {
+	                var[dem] = 1; // Gán giá trị "1"
+	                dem++;
+	            }
+	        }
+
+	        last_key = 1;           // Cập nhật phím vừa nhấn
+	        last_key_time = current_time; // Cập nhật thời gian nhấn
+	    }
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4)==0)                // nhan phim 4
 		{
 			while(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4)==0){}
-			if(dem<4)
-			{
-				var[dem] = 4;
-				dem++;
-			}
-		}
+		    if (last_key == 4)
+					        {
+					            if ((current_time - last_key_time) <= 500)
+					            {
+					                var[dem-1] = 13;
+				//	                dem++;     // Đặt vị trí tiếp theo là var[1]
+					            }
+					            else
+					            {
+					                if (dem < 4)
+					                {
+					                    var[dem] = 4;
+					                    dem++;
+					                }
+					            }
+					        }
+					        else
+					        {
+					            if (dem < 4)
+					            {
+					                var[dem] = 4;
+					                dem++;
+					            }
+					        }
+
+					        last_key = 4;
+					        last_key_time = current_time;
+					    }
+
+
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)==0)                // nhan phim 7
 		{
 			while(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)==0){}
@@ -89,7 +144,7 @@ void quetbanphim()
 			if(dem>0)
 			{
 					dem--;
-					var[dem]=15;
+					var[dem]=17;
 			}
 		}
   HAL_GPIO_WritePin(GPIOB,GPIO_PIN_0,1);
@@ -97,21 +152,68 @@ void quetbanphim()
 	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_1,0);
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3)==0)                // nhan phim 2
 		{
-			while(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3)==0){}
-			if(dem<4)
-			{
-				var[dem] = 2;
-				dem++;
-			}
+		 {
+			        while (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3) == 0) {}
+
+			        if (last_key == 2)
+			        {
+			            if ((current_time - last_key_time) <= 500)
+			            {
+			                var[dem-1] = 11;
+		//	                dem++;     // Đặt vị trí tiếp theo là var[1]
+			            }
+			            else
+			            {
+			                if (dem < 4)
+			                {
+			                    var[dem] = 2;
+			                    dem++;
+			                }
+			            }
+			        }
+			        else
+			        {
+			            if (dem < 4)
+			            {
+			                var[dem] = 2;
+			                dem++;
+			            }
+			        }
+
+			        last_key = 2;
+			        last_key_time = current_time;
+			    }
 		}
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4)==0)                // nhan phim 5
 		{
 			while(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4)==0){}
-			if(dem<4)
-			{
-				var[dem] = 5;
-				dem++;
-			}
+		    if (last_key == 5)
+					        {
+					            if ((current_time - last_key_time) <= 500)
+					            {
+					                var[dem-1] = 14;
+				//	                dem++;     // Đặt vị trí tiếp theo là var[1]
+					            }
+					            else
+					            {
+					                if (dem < 4)
+					                {
+					                    var[dem] = 5;
+					                    dem++;
+					                }
+					            }
+					        }
+					        else
+					        {
+					            if (dem < 4)
+					            {
+					                var[dem] = 5;
+					                dem++;
+					            }
+					        }
+
+					        last_key = 5;
+					        last_key_time = current_time;
 		}
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)==0)                // nhan phim 8
 		{
@@ -137,21 +239,67 @@ void quetbanphim()
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3)==0)                // nhan phim 3
 		{
 			while(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3)==0){}
-			if(dem<4)
-			{
-				var[dem] = 3;
-				dem++;
-			}
-		}
+		    if (last_key == 3)
+					        {
+					            if ((current_time - last_key_time) <= 500)
+					            {
+					                var[dem-1] = 12;
+				//	                dem++;     // Đặt vị trí tiếp theo là var[1]
+					            }
+					            else
+					            {
+					                if (dem < 4)
+					                {
+					                    var[dem] = 3;
+					                    dem++;
+					                }
+					            }
+					        }
+					        else
+					        {
+					            if (dem < 4)
+					            {
+					                var[dem] = 3;
+					                dem++;
+					            }
+					        }
+
+					        last_key = 3;
+					        last_key_time = current_time;
+					    }
+
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4)==0)                // nhan phim 6
 		{
 			while(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4)==0){}
-			if(dem<4)
-			{
-				var[dem] = 6;
-				dem++;
-			}
-		}
+		    if (last_key == 6)
+					        {
+					            if ((current_time - last_key_time) <= 500)
+					            {
+					                var[dem-1] = 15;
+				//	                dem++;     // Đặt vị trí tiếp theo là var[1]
+					            }
+					            else
+					            {
+					                if (dem < 4)
+					                {
+					                    var[dem] = 6;
+					                    dem++;
+					                }
+					            }
+					        }
+					        else
+					        {
+					            if (dem < 4)
+					            {
+					                var[dem] = 6;
+					                dem++;
+					            }
+					        }
+
+					        last_key = 6;
+					        last_key_time = current_time;
+					    }
+
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)==0)                // nhan phim 9
 		{
 			while(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_5)==0){}
@@ -169,33 +317,170 @@ void quetbanphim()
 	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_2,1);
 }
 
-void IC_7447(uint8_t number)
+void LED(uint8_t number)
 {
-HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4,(number/1)%2);
-HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,(number/2)%2);
-HAL_GPIO_WritePin(GPIOA,GPIO_PIN_6,(number/4)%2);
-HAL_GPIO_WritePin(GPIOA,GPIO_PIN_7,(number/8)%2);
+    switch (number){
+        case 0: // Hiển thị "0"
+        	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 , 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 1); // a
+
+            break;
+        case 1: // Hiển thị "1"
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5| GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10| GPIO_PIN_11, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6|GPIO_PIN_7, 0);
+
+            break;
+        case 2: // Hiển thị "2"
+        	 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5| GPIO_PIN_6 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_11, 0);
+        	 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10|GPIO_PIN_7, 1);
+
+            break;
+        case 3: // Hiển thị "3"
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 0);
+            break;
+        case 4: // Hiển thị "4"
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 0);
+            break;
+        case 5: // Hiển thị "5"
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 0);
+            break;
+        case 6: // Hiển thị "6"
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 0);
+            break;
+        case 7: // Hiển thị "7"
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 1);
+            break;
+        case 8: // Hiển thị "8"
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 0);
+            break;
+        case 9: // Hiển thị "9"
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 0);
+            break;
+        case 10: // Hiển thị "A"
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 1);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 0);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 0);
+            break;
+        case 11: // Hiển thị "B"
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 1);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 0);
+               break;
+           case 12: // Hiển thị "C"
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 1);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 1);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 1);
+               break;
+           case 13: // Hiển thị "D"
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 1);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 0);
+               break;
+           case 14: // Hiển thị "E"
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 1);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 1);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 0);
+               break;
+           case 15: // Hiển thị "F"
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, 1);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, 1);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, 1);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, 0);
+               HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 0);
+               break;
+        default: // Tắt LED
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7 |
+                                     GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 , 1);
+            break;
+    }
+
 }
+
+
 void quetled()
 {
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0,1);                // quet led so 1
-	IC_7447(var[0]);
+	LED(var[0]);
 	HAL_Delay(5);
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_0,0);
 
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_1,1);                // quet led so 2
-	IC_7447(var[1]);
+	LED(var[1]);
 	HAL_Delay(5);
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_1,0);
 
 
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_2,1);                // quet led so 3
-	IC_7447(var[2]);
+	LED(var[2]);
 	HAL_Delay(5);
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_2,0);
 
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_3,1);                // quet led so 4
-	IC_7447(var[3]);
+	LED(var[3]);
 	HAL_Delay(5);
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_3,0);
 
@@ -217,23 +502,29 @@ void CheckPass(void)
         if (match)
         {
             for (int i = 0; i < 4; i++)
-                var[i] = 10; // Hiển thị thành công
+                var[i] = 11; // Hiển thị thành công
             dem = 0;
             Nhapsai = 0; // Reset số lần nhập sai
+            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, SET);
+
+            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, RESET);
             HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, RESET);
 
         }
         else
         {
             for (int j = 0; j < 4; j++)
-                var[j] = 15; // Hiển thị thất bại
+                var[j] = 17; // Hiển thị thất bại
             dem = 0;
             Nhapsai++; // Tăng số lần nhập sai
+            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, SET);
+            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, RESET);
+
         }
     }
     else
     {
-HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_12);
+HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_11);
 
 HAL_Delay(200);}
 }
@@ -281,10 +572,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+quetbanphim();
+quetled();
     /* USER CODE END WHILE */
 
-	  quetbanphim();
-	  quetled();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -344,10 +635,14 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, L1_Pin|L2_Pin|L3_Pin|L4_Pin
-                          |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7, GPIO_PIN_RESET);
+                          |GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8
+                          |GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11|Q1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, C1_Pin|C2_Pin|C3_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11|GPIO_PIN_12|GPIO_PIN_13, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PC13 */
   GPIO_InitStruct.Pin = GPIO_PIN_13;
@@ -357,16 +652,20 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : L1_Pin L2_Pin L3_Pin L4_Pin
-                           PA4 PA5 PA6 PA7 */
+                           PA5 PA6 PA7 PA8
+                           PA9 PA10 PA11 Q1_Pin */
   GPIO_InitStruct.Pin = L1_Pin|L2_Pin|L3_Pin|L4_Pin
-                          |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7;
+                          |GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8
+                          |GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11|Q1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : C1_Pin C2_Pin C3_Pin */
-  GPIO_InitStruct.Pin = C1_Pin|C2_Pin|C3_Pin;
+  /*Configure GPIO pins : C1_Pin C2_Pin C3_Pin PB11
+                           PB12 PB13 */
+  GPIO_InitStruct.Pin = C1_Pin|C2_Pin|C3_Pin|GPIO_PIN_11
+                          |GPIO_PIN_12|GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
